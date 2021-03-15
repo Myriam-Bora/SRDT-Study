@@ -1,3 +1,6 @@
+주의 : 자바스크립트 코드에서 작성 시 제목 수준 모두 낮추기 
+
+
 ## *목차*
 
 <br>
@@ -125,41 +128,33 @@
 
 - 증가/감소( ++ / - - ) 연산자는 위치에 따라 차이가 있다
 
-  `var x = 5;`
-
-  `var result;`
-
-  `result = x++; *//5 6 : 선할당 후증가*`
-
-  `result = ++x; *//7 7 : 선증가 후할당*`
+ ```javascript
+    var x = 5;
+    
+    var result;
+    
+    result = x++; *//5 6 : 선할당 후증가*
+    
+    result = ++x; *//7 7 : 선증가 후할당*
+```
 
 - 숫자 타입이 아닌 피연산자에 + 단항 연산자를 사용하면 피연산자를 숫자 타입으로 변환하여 반환한다.
 
-  `var x = "5";`
+ ```javascript
+var x = "5";
 
-  `console.log(+x); *// 1  : 문자열을 숫자로 타입 변환한다*`
+console.log(+x); // 1  : 문자열을 숫자로 타입 변환한다
 
-  `console.log(x); *// "1" : 부수 효과는 없다*`
+console.log(x); // "1" : 부수 효과는 없다
 
-  
+var y = true;
 
-  `var y = true;`
+console.log(+x); *// 1  : 불리언 값을 숫자로 타입 변환한다*
 
-  `console.log(+x); *// 1  : 불리언 값을 숫자로 타입 변환한다*`
+var y = "hello";
 
-  
-
-  `var y = "hello";`
-
-  `console.log(+x); *//NaN : 문자열을 숫자로 타입 변환할 수 없다*`
-
-- 단항 연산자 - 는 피연산자의 부호를 반전한 값으로 반환한다
-
-  `console.log(-(-10)); *// 10  : 부호를 반전한다*`
-
-- 단항 연산자 + 와 마찬가지로, 숫자 타입이 아닌 피연산자에 - 단항 연산자를 사용하면 피연산자를 숫자 타입으로 변환하여 반환한다.
-
-  `console.log(-"10"); *// -10 : 문자열을 숫자로 타입 변환한다*`
+console.log(+x); *//NaN : 문자열을 숫자로 타입 변환할 수 없다*
+```
 
   
 
@@ -651,45 +646,52 @@
 
 - 단축 평가를 이용하여 if문을 대체 할 수 있다
 
-  `var done = true;`
+```javascript
+var done = true;
 
-  `var message = '';`
+var message = '';
 
-  `*//다음 두줄은 같은 문장이다 : done이 true이면 message에 '완료'를 할당한다*`
+*//다음 두줄은 같은 문장이다 : done이 true이면 message에 '완료'를 할당한다*
 
-  `*if*(done) message='완료'`
+*if*(done) message='완료'
 
-  `message = done && '완료';`
+message = done && '완료';
+```
 
 - 조건이 false 일 때 무언가를 해야한다면 논리합 연산자 표현식으로 if문을 대체할 수 있다
 
-  `var done = false;`
+ ```javascript
+var done = false;
 
-  `var message = '';`
+var message = '';
 
-  `*//다음 두줄은 같은 문장이다 : done이 false이면 message에 '미완료'를 할당한다*`
+*//다음 두줄은 같은 문장이다 : done이 false이면 message에 '미완료'를 할당한다*
 
-  `*if*(!done) message='미완료'`
+*if*(!done) message='미완료'
 
-  `message = done || '미완료';`
+message = done || '미완료';
+```
 
 - 삼항 조건 연산자도 if..else 문을 대체할 수 있다
 
-  `var done = true;`
+```javascript
+var done = true;
 
-  `var message = "";`
+var message = "";
 
-  `*//다음 두 문장은 똑같이 작동한다*`
+*//다음 두 문장은 똑같이 작동한다*
 
-  `*if* (done) message = "완료";`
+*if* (done) message = "완료";
 
-  `*else* message = "미완료";`
+*else* message = "미완료";
 
-  `console.log(message); *//완료*`
+console.log(message); *//완료*
 
-  `message = done ? "완료" : "미완료";`
+message = done ? "완료" : "미완료";
 
-  `console.log(message); *//완료*`
+console.log(message); *//완료*
+
+```
 
 
 
@@ -699,31 +701,37 @@
 
 - 객체를 가리키기를 기대하는 변수가 null 또는 indefined가 아닌가 확인하고 프로퍼티를 참조할 때 유용하다
 
-  `var elem = null;`
+ ```javascript
+ var elem = null;
 
-  `*//elem이 null 또는 undefined이면 undefined를 반환하고,*`
+*//elem이 null 또는 undefined이면 undefined를 반환하고,*
 
-  `*//그렇지 않으면 우항의 프로퍼티 참조를 이어간다*`
+*//그렇지 않으면 우항의 프로퍼티 참조를 이어간다*
 
-  `var value = elem?.value;`
+var value = elem?.value;
 
-  `console.log(value); *//undefined*` 
+console.log(value); *//undefined* 
+ ```
 
 - 옵셔널 체이닝 연산자가 도입되지 이전에는 논리연산자(&&)를 사용하였지만 좌항 피연산자가 0 이나 ' ' 인 경우 문제가 생긴다
 
-  `var str = '';`
+ ```javascript
+ var str = '';
 
-  `var length = str && str.length; //str가 false 이므로 str을 반환한다` 
+var length = str && str.length; //str가 false 이므로 str을 반환한다 
 
-  `console.log(length); *// ''  : 문자열의 길이를 참조하지 못한다*`
+console.log(length); *// ''  : 문자열의 길이를 참조하지 못한다*
+ ```
 
 - 옵셔널 체이닝 연산자는 좌항 피연산자가 false로 평가되는 값이라도 null 또는 undefined가 아니면 우항의 프로퍼티 참조를 이어갈 수 있다.
 
-  `var str = "";`
+```javascript
+var str = "";
 
-  `var length = str?.length;`
+var length = str?.length;
 
-  `console.log(length); *// 0  : 문자열의 길이를 참조했다*`
+console.log(length); *// 0  : 문자열의 길이를 참조했다*
+```
 
 
 
@@ -767,13 +775,15 @@
 
 - 0개 이상의 프로퍼티로 구성된 집합이며 프로퍼티는 키 key와 값value로 구성된다
 
-  `var person ={`
+```javascript
+var person ={
 
-    `name:'lee',   *//프로퍼티*`
+  name:'lee',   *//프로퍼티*
 
-    `age:20     *//프로퍼티*`
+  age:20     *//프로퍼티*
 
-  `}`
+}
+```
 
 
 
@@ -791,43 +801,49 @@
 
 ## 10.3 프로퍼티
 
-- ***<u>프로퍼티</u>***  : 객체는 프로퍼티의 집합. 프로퍼티는 키와 값으로 구성된다
+***<u>프로퍼티</u>***  : 객체는 프로퍼티의 집합. 프로퍼티는 키와 값으로 구성된다
 
 - 프로퍼티 키는 반드시 식별자 네이밍 규칙을 따라야 하는 것은 아니지만, 식별자 네이밍 규칙을 따르지 않는 이름에는 반드시 따옴표를 사용해야 한다
 
-  `var person ={`
+```javascript
+  var person ={
 
-    `firstName : 'Ung-mo',  *//식별자 네이밍 규칙을 준수하는 프로퍼티 키 : 따옴표 생략 가능*`
+  firstName : 'Ung-mo',  *//식별자 네이밍 규칙을 준수하는 프로퍼티 키 : 따옴표 생략 가능*
 
-    `'last-name' : 'Lee'   *//식별자 네이밍 규칙을 준수하지 않은 프로퍼티 키 : 따옴표 생략 불가*`
+  'last-name' : 'Lee'   *//식별자 네이밍 규칙을 준수하지 않은 프로퍼티 키 : 따옴표 생략 불가*
 
-  `};`
+};
+```
 
 - 문자열 또는 문자열로 평가할 수 있는 표현식도 프로퍼티 키로 생성할 수 있다.
 
   이 경우에는 대활호 [ ... ] 로 묶어야 한다
 
-  `var obj = {};`
+```javascript
+ var obj = {};
 
-  `var a = "hello";`
+var a = "hello";
 
-  `obj[a] = "world"; *//ES5 : 프로퍼티 키 동적 생성*`
+obj[a] = "world"; *//ES5 : 프로퍼티 키 동적 생성*
 
-  `console.log(obj); *//{hello : "world"}*`
+console.log(obj); *//{hello : "world"}*
+```
 
 - 프로퍼티 키에 문자열이나 심벌 값 외의 값을 사용하면 암묵적 타입 변환을 통해 문자열이 된다
 
-  `var foo = {`
+```javascript
+var foo = {
 
-   `0: 1,`
+ 0: 1,
 
-   `1: 2,`
+ 1: 2,
 
-   `2: 3,`
+ 2: 3,
 
-  `};`
+};
 
-  `console.log(foo); *// {0: 1, 1: 2, 2: 3} : 따옴표는 붙지 않지만 내부적으로 문자열로 변환*`
+console.log(foo); *// {0: 1, 1: 2, 2: 3} : 따옴표는 붙지 않지만 내부적으로 문자열로 변환*
+```
 
 - 이미 존재하는 프로퍼티 키를 중복 선언하면 나중에 선언한 프로퍼티가 먼저 선언된 프로퍼티를 덮어쓴다
 
@@ -839,17 +855,19 @@
 
 - 프로퍼티 값이 함수일 경우, 일반 함수와 구분하기 위해 메서드라 부른다
 
-  `var counter={`
-
-    `num:0,         *//프로퍼티*`
-
-    `increase:function(){`  
-
-  ​    `this.num++;`     //this는 counter 를 가리킨다
-
-    `}             *//메서드*`
-
-  `}`
+```javascript
+   var counter={
+  
+      num:0,         //프로퍼티
+  
+      increase:function(){  
+        this.num++;    //this는 counter 를 가리킨다
+  
+      }             //메서드
+  
+    }
+  
+```
 
 
 
