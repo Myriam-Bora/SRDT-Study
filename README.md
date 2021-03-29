@@ -1609,3 +1609,170 @@ function removeAll(array,item){
 console.log(removeAll(arr,2));   //[1,3,1]
 ```
 
+### 27.8.9 Array.prototype.slice
+
+- 인수로 전달된 범위의 요소들을 복사하여 배열로 반환
+- 원본 배열은 변경되지 않는다
+- 두 개의 매개변수를 갖는다
+  - start : 복사를 시작할 인덱스
+    - 음수 : 배열의 끝에서 인덱스를 나타난다 
+      - 예) splice(-2) : 배열의 마지막 두 개의 요소를 복사하여 배열로 반환
+  - end : 복사를 종료할 인덱스
+    - 인덱스에 해당하는 요소는 복사되지 않는다
+    - 생략 시 기본값은 length프로퍼티 값
+
+- 매개변수를 모두 생략하면 원본 배열의 복사본을 생성하여 반환
+  - 생성된 복사본은 <u>***얕은 복사***</u>(11.2.1절 참고)로 생성된다
+  - 참고)
+    - 얕은 복사 : 한 단계까지만 복사
+    - 깊은 복사: 객체에 중첩되어 있는 객체까지 복사
+
+```javascript
+const todos = [
+  {id:1, content:'HTML'},
+  {id:2, content:'CSS'},
+  {id:3, content:'JavaScript'},
+];
+
+const _todos = todos.slice();
+console.log(_todos === todos);  //false : 참조값이 다른 별개의 객체이다
+console.log(_todos[0] === todos[0])  //true : 참조값이 같다. 얕은 복사
+```
+
+- arguments,HTMLCollection,NodeList 와 같은 유사 배열 객체를 배열로 변환할 수 있다
+
+```javascript
+function sum(){
+	var arr = Array.prototype.slice.call(arguments);
+    console.log(arr);  //[1,2,3]
+    
+    return arr.reduce(function (pre,cur){
+        return pre+cur;
+    },0)
+}
+cosole.log(sum(1,2,3));; //6
+```
+
+- Array.from 메서드를 사용하면 더 간단하게 유사 배열 객체를 배열로 변환할 수 있다 (27.4.4절 참고)
+
+### 27.8.10 Array.prototype.join
+
+- 원본 배열의 모든 요소를 문자열로 변환한 후 인수로 전달받은 문자열(구분자)로 연결한 문자열을 반환
+- 구분자는 생략 가능. 기본 구분자는 콤마(,) 이다
+
+```javascript
+const arr = [1,2,3,4];
+arr.join();   // '1,2,3,4';
+arr.join('');  //'1234';
+arr.join(':');  //'1:2:3:4';
+```
+
+### 27.8.11 Array.prototype.reverse
+
+- 원본 배열의 순서를 반대로 뒤집는다
+- 원본 배열이 변경된다
+- 반환값은 변경된 배열이다
+
+```javascript
+const arr= [1,2,3];
+const result = arr.reverse();
+console.log(arr);  //[3,2,1]
+console.log(result); //[3,2,1]
+```
+
+### 27.8.12 Array.prototype.fill
+
+- 인수로 전달받은 값을 배열의 처음부터 끝까지 요소로 채운다
+- 원본 배열이 변경된다
+
+```javascript
+const arr = [1,2,3];
+arr.fill(0);
+console.log(arr); // [0,0,0];
+```
+
+- 두 번째 인수로 요소 채우기를 시작할 인덱스를 정할 수 있다
+
+```javascript
+const arr = [1,2,3];
+arr.fill(0,1);
+console.log(arr);  //[1,0,0];
+```
+
+- 세 번째 인수로 요소 채우기를 멈출 인덱스를 정할 수 있다
+
+```javascript
+const arr = [1,2,3,4,5];
+arr.fill(0,1,3); //전달 받은 값 0을 배열의 인덱스 1부터 3 이전(인덱스 3 미포함)까지 요소로 채운다
+console.log(arr);  //[1,0,0,4,5]
+```
+
+- 배열을 생성하면서 특정 값으로 요소를 채울 수 있다
+
+```javascript
+const arr = new Array(3);
+console.log(arr);  //[empty *3]
+const result = arr.fill(1);
+console.log(arr); //[1,1,1]
+console.log(result); //[1,1,1]
+```
+
+- 모든 요소를 하나의 값만으로 채울 수밖에 없는 단점이 있다
+  - Array.from 메서드를 사용하여 두 번째 인수로 전달한 콜백 함수를 통해 요소값을 만들면서 배열을 채울 수 있다
+  - Array.from 메서드는 두 번째 인수로 전달한 콜백 함수에 첫 번째 인수에 의해 생성된 배열의 요소값과 인덱스를 순차적으로 전달하면서 호출하고 콜백함수의 반환값으로 구성된 배열을 반환한다
+
+```javascript
+//인수로 전달받은 정수만큼 요소를 생성하고 0부터 1씩 증가하면서 요소를 채운다
+const sequences = (length = 0) => Array.from({length}, (_,i)=> i);
+//const sequences = (lenght = 0) => Array.from(new Array(length), _,i => i);
+console.log(sequences(3));   //[0,1,2]
+```
+
+### 27.8.13 Array.prototype.includes
+
+- 배열 내에 특정 요소가 포함되어 있는지 확인하고 true / false를 반환한다
+- 첫째 인수 :검색할 대상
+
+```javascript
+const arr = [1,2,3];
+arr.includes(2);   //true
+arr.includes(100); //false
+```
+
+- 두 번째 인수 : 검색을 시작할 인덱스
+  - 생략 할 경우 : 기본값 0
+  - 음수 : length 프로퍼티 값과 음수 인덱스를 합산하여 (length + index) 검색 시작 인덱스 설정
+
+- indexOf메서드를 사용해서 특정 요소가 있는지 확인할 수 있다
+  - 단, 반환값이 -1인지 확인 해야하고
+  - 배열에 NaN 이 포함되어 있는지 확인할 수 없다
+
+```javascript
+[NaN].indexOf(NaN) !== -1   //false
+[NaN].includes(NaN);   	//true
+```
+
+### 27.8.14 Array.prototype.flat
+
+- 인수로 전달한 깊이만큼 재귀적으로 배열을 평탄화 한다
+
+```javascript
+[1,[2,3,4,5]].flat();   //[1,2,3,4,5]
+```
+
+- 중첩 배열을 평탄화할 깊이를 인수로 전달할 수 있다
+  - 생략할 경우 : 기본값 1
+  - Infinity 인 경우 : 중첩 배열 모두를 평탄화 한다
+
+```javascript
+[1,[2,[3,[4]]]].flat();  //[1,2,[3,[4]]];
+[1,[2,[3,[4]]]].flat(1); //[1,2,[3,[4]]];
+
+[1,[2,[3,[4]]]].flat(2); //[1,2,3,[4]];
+[1,[2,[3,[4]]]].flat().flat();  //[1,2,3,[4]];     -> 2번 평탄화한 것과 동일
+
+[1,[2,[3,[4]]]].flat(Infinity);  //[1,2,3,4]; -> 배열 모두를 평탄화
+```
+
+
+
