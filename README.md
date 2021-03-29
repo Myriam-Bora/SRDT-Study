@@ -2080,3 +2080,131 @@ console.log(user);   //[{id:2, name:'kim'}]
 - ***<u>중복된 요소중에 하나만 제거하려면 indexOf 메서드를 통해 특정 요소의 인덱스를 취득한 다음 splice 메서드를 사용한다</u>***
 
 
+### 27.9.5  Array.prototype.reduce
+
+- 자신을 호출한 배열을 모든 요소를 순회하며 인수로 전달받은 콜백 함수를 반복 호출한다
+- 콜백함수의 반환값을 다음 순회 시에 콜백함수의 첫 번째 인수로 전달하면서 콜백함수를 호출하여 하나의 결과값을 만들어 반환한다
+- 원본 배열은 변경되지 않는다
+- 첫번째 인수 : 콜백함수
+  - 콜백함수 : 4개의 인수
+    - 첫번째 : 초기값 또는 콜백함수의 이전 반환값
+    - 두번째 : reduce 메서드를 호출한 배열의 요소값
+    - 세번째 : 인덱스
+    - 네번째 : reduce 메서드를 호출한 배열자체. this
+- 두번째 인수 : 초기값
+
+```javascript
+//1부터 4까지 누적을 구한다
+const sum = [1,2,3,4].reduce((accumulator, currentValue, index, array) => accumulator + currentValue, 0);
+console.log(sum);   //10
+```
+
+- 콜백함수는 4개의 인수를 전달받아 배열의 lenght만큼 총4회 호출된다
+- 이때 콜백함수로 전달되는 인수와 콜백함수의 반환값은 다음과 같다
+
+|    구분     | accumulator (이전값) | currentValue | index |   array   |             반환값              |
+| :---------: | :------------------: | :----------: | :---: | :-------: | :-----------------------------: |
+| 첫번째 순회 |      0 (초기값)      |      1       |   0   | [1,2,3,4] | accumulator + currentValue = 1  |
+| 두번째 순회 |          1           |      2       |   1   | [1,2,3,4] | accumulator + currentValue = 3  |
+| 세번째 순회 |          3           |      3       |   2   | [1,2,3,4] | accumulator + currentValue = 6  |
+| 네번째 순회 |          6           |      4       |   3   | [1,2,3,4] | accumulator + currentValue = 10 |
+
+- 두 번째 인수로 전달하는 초기값은 옵션이다. 즉 생략 가능
+- 하지만, 메서드를 호출할 땐 초기값을 전달하는 것이 안전하다
+- recude 메서드는 하나의 결과값을 반환한다
+- ***<u>자신을 호출한 배열의 모든 요소를 순회하며 하나의 결과값을 구해야 하는 경우에 사용한다</u>***
+- 다양한 활용법
+  - 평균 구하기
+  - 최대값 구하기
+  - 요소의 중복 횟수 구하기
+  - 중첩 배열 평탄화
+  - 중복 요소 제거
+
+### 27.9.6 Array.prototype.some
+
+- 자신을 호출한 배열의 요소를 순회하면서 인수로 전달된 콜백함수를 호출한다
+- 콜백함수의 반환값이 단 한번이라도 참이면 true, 모두 거짓이면 false를 반환한다
+- 즉, 정의한 조건을 만족하는 요소가 1개 이상 존재하는지 확인하여 그 결과는 불리언 타입으로 반환한다
+- 단, 빈 배열인 경우 언제나 false를 반환한다
+- 3개의 인수(호출한 요소값 , 인덱스 , this(some메서드를 호출한 배열 자체))를 전달받을 수 있다 (화살표 함수 사용 권장)
+
+```javascript
+[5,10,15].some(item => item > 10);  //true
+[5,10.15].some(item => item < 0);   //false
+['apple','banana','mango'].some(item => item === 'banana');  //true
+[].some(item => item > 3);   //false
+```
+
+
+
+### 27.9.7 Array.prototype.every
+
+- 자신을 호출한 배열의 요소를 순회하면서 인수로 전달된 콜백함수를 호출한다
+- 콜백함수의 반환값이 모두 참이면 true, 단 한번이라도 거짓하면 false를 반환한다
+- 즉, 배열의 모든 요소가 정의한 조건을 모두 만족하는지 확인하여 그 결과를 불리언 타입으로 반환한다
+- 단, 빈 배열인 경우 언제나 true를 반환한다
+- 3개의 인수(호출한 요소값 , 인덱스 , this(every메서드를 호출한 배열 자체))를 전달받을 수 있다 (화살표 함수 사용 권장)
+
+### 27.9.8 Array.prototype.find
+
+- 자신을 호출한 배열의 요소를 순회하면서 인수로 전달된 콜백함수를 호출하여 반환값이 true인 첫 번째 <u>***요소를 반환한다***</u>
+
+- 콜백함수의 반환값이 true인 요소가 존재하지 않으면 undefined를 반환한다
+
+- 3개의 인수(호출한 요소값 , 인덱스 , this(find 메서드를 호출한 배열 자체))를 전달받을 수 있다 (화살표 함수 사용 권장)
+
+  ```javascript
+  const users = [
+      {id:1,name:'lee'},
+       {id:2,name:'kim'},
+       {id:2,name:'choi'},
+       {id:3,name:'park'},
+  ];
+  users.find(user => user.id === 2);   // {id:2, name:'kim'}  -> 배열이 아닌 요소를 반환한다
+  ```
+
+  
+
+### 27.9.9 Array.prototype.findIndex
+
+- 자신을 호출한 배열의 요소를 순회하면서 인수로 전달된 콜백함수를 호출하여 반환값이 true인 첫 번째 요소의 ***<u>인덱스를 반환한다</u>***
+- 콜백함수의 반환값이 true인 요소가 존재하지 않는다면 -1을 반환한다
+- 3개의 인수(호출한 요소값 , 인덱스 , this(findIndex메서드를 호출한 배열 자체))를 전달받을 수 있다 (화살표 함수 사용 권장)
+
+```javascript
+const users = [
+   {id:1,name:'lee'},
+     {id:2,name:'kim'},
+     {id:2,name:'choi'},
+     {id:3,name:'park'}
+];
+users.findIndex(user => user.id === 2);  //1
+users.findIndex(user => user.name === 'park');  //3
+
+//위와 같이 프로퍼티 키와 프로퍼티 값으로 요소의 인덱스를 구하는 경우 다음과 같이 콜백함수를 추상화할 수 있다
+function predicate(key,value){
+    return item => item[key] === value;    //key와 value를 기억하는 클로저를 반환
+}
+
+users.findIndex(predicate('id',2)); //1   -> id기 2인 요소의 인덱스를 구한다
+users.findIndex(predicate('name','park')); //3 -> name이 'park'인 요소의 인덱스를 구한다
+```
+
+
+
+### 27.9.10 Array.prototype.flatMap
+
+- map 메서드를 통해 생성된 새로운 배열을 평탄화 한다
+- 즉, map 메서드와 flat메서드를 순차적으로 실행하는 효과가 있다
+
+```javascript
+const arr = ['hello','world'];
+
+//map과 flat을 순차적으로 실행
+arr.map(x => x.split('').flat());  // ['h','e','l','l','o','w','o','r','l','d']
+arr.flatMap(x => x.split(''));      // ['h','e','l','l','o','w','o','r','l','d']
+```
+
+- 단, flat메서드처럼 평탄화 깊이를 지정할 수는 없고 1단계만 평탄화 한다
+- map메서드를 통해 생성된 중첩 배열의 평탄화 깊이를 지정해야 하면, flatMap 메서드를 사용하지 않고 map,flat 메서드를 각각 호출해야한다
+
