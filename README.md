@@ -113,7 +113,9 @@
 **[10.9 ES6에서 추가된 객체 리터럴의 확장 기능](#109-es6에서-추가된-객체-리터럴의-확장-기능)**
 
 - [10.9.1 프로퍼티 축약 표현](#1091-프로퍼티-축약-표현)
+
 - [10.9.2 계산된 프로퍼티 이름](#1092-계산된-프로퍼티-이름)
+
 - [10.9.3 메서드 축약 표현](#1093-메서드-축약-표현)
 
 <br>
@@ -121,6 +123,23 @@
 ### [27 배열](#27-배열)
 
 **[27.1 배열이란?](#271-배열이란)** 
+
+**[27.2 자바스크립트 배열은 배열이 아니다](#272-자바스크립트-배열은-배열이-아니다)** 
+
+**[27.3 length 프로퍼티와 희소 배열](#273-length-프로퍼티와-희소-배열)** 
+
+**[27.4 배열 생성](#274-배열-생성)** 
+
+**[27.5 배열 요소의 참조](#275-배열-요소의-참조)** 
+
+**[27.6 배열 요소의 추가와 갱신](#276-배열-요소의-추가와-갱신)**
+
+**[27.7 배열 요소의 삭제](#277-배열-요소의-삭제)** 
+
+**[27.8 배열 메서드](#278-배열-메서드)** 
+
+**[27.9 배열 고차 함수](#279-배열-고차-함수)** 
+
 
 ------
 
@@ -1380,6 +1399,44 @@ const obj ={ x, y };
 
 ## 27.4 배열 생성
 
+## 27.1 배열이란?
+
+------
+
+
+
+## 27.2 자바스크립트 배열은 배열이 아니다
+
+- 배열은 객체지만 일반 객체와는 구별되는 특징이 있다
+
+|      구분       |          객체          |     배열      |
+| :-------------: | :--------------------: | :-----------: |
+|      구조       | 프로퍼티와 프로퍼티 값 | 인덱스와 요소 |
+|    값의 참조    |      프로퍼티 키       |    인덱스     |
+|    값의 순서    |           X            |       O       |
+| length 프로퍼티 |           X            |       O       |
+
+- 값의 순서와 length프로퍼티를 갖고 있는 배열은 <u>***반복문을 통해 순차적으로 값에 접근하기 적합한 자료구조***</u>이다.
+- ***<u>밀집배열</u>***  : 동일한 크기의 메모리 공간이 빈틈없이 연속적으로 나열된 자료구조
+- 인덱스를 통해 단 한번의 연산으로 임의의 요소에 접근하여 효율적인 동작 가능
+- 단, 정렬되지 않은 배열에서 특정한 요소를 찾는 경우 처음부터 특정 요소를 발견할 때까지 차례대로 검색해야 한다
+- 요소를 삽입하거나 삭제하는 경우 배열의 요소를 연속적으로 유지하기 위해 요소를 이동 시켜야 한다
+- ***희소배열*** : 동일하지 않는 크기의 메모리 공간과 연속적으로 이어져 있지 않는 자료구조
+- 자바스크립트의 배열은 인덱스로 배열 요소에 접근하는 경우는 일반적인 배열보다 느리지만 특정 요소를 검색하거나 삽입/삭제하는 경우에는 일반적인 배열보다 빠르다
+
+
+
+------
+
+## 27.3 length 프로퍼티와 희소 배열
+
+- 일반적인 배열의 length는 배열의 길이와 요소의 갯수가 일치한다
+- 단, 희소배열은 실제 요소 개수보다 언제나 크다
+
+------
+
+## 27.4 배열 생성
+
 ### 27.4.3 Array.of 
 
 - 전달된 인수를 요소로 갖는 배열을 생성
@@ -1401,7 +1458,7 @@ Array.from('Hello');  					// 이터러블 -> ['H','e','l','l','o']
 
 ------
 
-## 27.5  배열 요소의 참조
+## 27.5 배열 요소의 참조
 
 ------
 
@@ -1752,6 +1809,8 @@ arr.includes(100); //false
 [NaN].includes(NaN);   	//true
 ```
 
+---- 
+
 ### 27.8.14 Array.prototype.flat
 
 - 인수로 전달한 깊이만큼 재귀적으로 배열을 평탄화 한다
@@ -1774,5 +1833,250 @@ arr.includes(100); //false
 [1,[2,[3,[4]]]].flat(Infinity);  //[1,2,3,4]; -> 배열 모두를 평탄화
 ```
 
+
+
+------
+
+
+
+## 27.9 배열 고차 함수
+
+- ***<u>고차함수</u>*** : 함수를 인수로 전달하거나 함수를 반환하는 함수
+
+
+
+### 27.9.1 Array.prototype.sort
+
+- 배열의 요소를 정렬
+- 원변 배열을 직접 변경
+- 정렬된 배열을 반환한다
+- 기본적으로 오름차순으로 정렬한다
+- 내림차순으로 정렬하려면 sort메서드를 사용 후 reverse 메서드를 사용한다
+
+```javascript
+const fruits = ['Banana','Orange','Apple'];
+fruits.sort();
+console.log(fruits);  //['Apple','Banana','Orange'];
+fruits.reverse();
+console.log(fruits); //['Orange','Banana','Apple'];
+```
+
+- 숫자 요소로 이루어진 배열을 정렬하면, 숫자가 아닌 유니코드 코드 포인트의 순서를 따른다
+
+```javascript
+const points = [40,100,1,5,2,25,10];
+points.sort();
+console.log(points);  //[1,10,100,2,25,40,5] : 의도한 대로 정렬되지 않는다
+```
+
+- 따라서 숫자 요소를 정렬할 때는 sort 메서드에 정렬 순서를 정의하는 비교 함수를 인수로 전달해야 한다
+  - 비교 함수는 양수나 음수 또는 0을 반환해야 한다
+  - 비교 함수의 반환값이 0보다 작으면 비교 함수의 첫 번째 인수를 우선하여 정렬하고
+  - 0이면 정렬하지 않는다
+  - 0보다 크면 두 번째 인수를 우선하여 정렬한다
+
+```javascript
+const points = [40,100,1,5,2,25,10];
+//오름차순 정렬. 비교 함수의 반환값이 0보다 작으면 a를 우선하여 정렬한다
+points.sort((a,b) => a-b);
+console.log(points);  //[1,2,5,10,25,40,100]
+
+//숫자 배열에서 최소/최대값 취득
+console.log(points[0], points[points.length -1]);   //1, 100
+
+//내림차순 정렬. 비교 함수의 반환값이 0보다 작으면 b를 우선하여 정렬한다
+point.sort((a,b) => b-a);
+console.log(points);  //[100,40,25,10,5,2,1];
+
+//숫자 배열에서 최소/최대값 취득
+console.log(points[points.length -1], points[0]);  //1 100
+```
+
+- ***<u>객체를 요소로 갖는 배열을 정렬하는 방법</u>***
+
+```javascript
+const todos = [
+    {id:3, content:"HTML"},
+    {id:1, content:"CSS"},
+    {id:2, content:"JavaScript"},
+];
+
+//key 는 프로퍼티 키
+//프로퍼키 값이 문자열일 때 - 산술 연산으로 비교하면 NaN이 나오므로 비교 연산을 사용한다
+//비교 함수는 양수/음수/0을 반환하면 되므로 - 산술 연산 대신 비교 연산을 사용할 수 있다
+function compare(key){
+    return (a,b) => (a[key] > b[key] ? 1 : (a[key] < b[key] ? -1 : 0));
+}
+
+//id를 기준으로 오름차순 정렬
+todos.sort(compare('id'));
+console.log(todos);
+
+/*
+ {id:1, content:"CSS"},
+ {id:2, content:"JavaScript"},
+ {id:3, content:"HTML"}
+*/
+```
+
+
+
+### 27.9.2 Array.prototype.forEach
+
+- for문을 대체할 수 있는 고차 함수
+- 자신의 내부에서 반복문을 실행 한다
+- 즉, 내부에서 반복문을 통해 자신을 호출한 배열을 순회하면서 수행해야 할 처리를 콜백함수로 전달받아 반복 호출한다
+
+```javascript
+const numbers = [1,2,3];
+const pows = [];
+
+numbers.forEach(item => pows.push(item **2));
+console.log(pows);  //[1,4,9];
+```
+
+- forEach메서드는   3개의 인수(호출한 요소값 , 인덱스 , this(forEach메서드를 호출한 배열 자체))를 전달받을 수 있다
+
+```javascript
+// 인자 3개 (요소값,인덱스,this)
+// JSON.stirngify 메서드 : 객체를 JSON 포맷의 문자열로 변환 (43.2.2절 참고)
+[1,2,3].forEach((item,index,arr) =>{
+    console.log(item , index, JSON.stringify(arr));
+});
+
+/*
+1 , 0 , [1,2,3]
+2 , 1 , [1,2,3]
+3 , 2 , [1,2,3]
+*/
+```
+
+- 원본 배열을 변경하지 않는다
+- 단, 콜백 함수를 통해 원본 배열을 변경할 수 있다
+
+```javascript
+const numbers = [1,2,3];
+
+//콜백 함수의 세 번째 매개변수 arr은 원본배열 numbers를 가리킨다
+//따라서 arr를 직접 변경하면 원본 배열 numbers가 변경된다
+numbers.forEach((item,index,arr) => {arr[index] = item **2;});
+console.log(numbers);     //[1,4,9]
+```
+
+- 반환값은 언제나 undefined 이다
+- 두 번째 인수로 forEach 메서드의 콜백 함수 내부에서 this로 사용할 객체를 전달 할 수 있다
+
+```javascript
+class Numbers{
+	numberArray = [];
+	multiply(arr){
+        arr.forEach(item => this.numberArray.push(item * item)); //화살표 함수 내부에서 this를 참조하면 상위 스코프의 this를 참조
+    }
+}
+
+const numbers = new Numbers();
+numbers.multiply([1,2,3]);
+console.log(numbers.numberArray); //[1,4,9];
+```
+
+- for문과 달리 break,contunue 문을 사용할 수 없기 때문에 배열의 모든 요소를 순회해야 한다
+- 희소 배열인 경우 존재하지 않는 요소는 순회 대상에서 제외된다
+- for 문에 비해 성능이 좋진 않지만 가독성이 더 좋다
+- 따라서 요소가 많은 배열을 순회하거나 시간이 많이 걸리는 복잡한 코드, 높은 성능이 필요한 경우가 아니라면 forEach 사용할 것을 권장
+
+### 27.9.3 Array.prototype.map
+
+- 자신을 호출한 배열의 모든 요소를 순회하면서 인수로 전달 받은 콜백함수를 반복 호출한다
+- 콜백 함수의 반환값들로 구성된 새로운 배열을 반환
+- 원본 배열은 변경되지 않는다
+
+```javascript
+const numbers = [1,4,9];
+const roots = numbers.map(item => Math.sqrt(item));
+console.log(roots);  //[1,2,3]
+```
+
+- forEach 와의 공통점
+  - 자신을 호출한 배열의 모든 요소를 순회하면서 인수로 전달받은 콜백함수를 반복 호출
+- **<u>*map 과 forEach 의 차이점*</u>**
+  - forEach : 언제나 undefined를 반환  -> 단순히 반복문을 대체하기 위한 고차 함수
+  - map : 새로운 배열을 반환 -> 요소값을 다른 값으로 매핑한 새로운 배열을 생성하기 위한 고차 함수
+- map 메서드가 생성하여 반환하는 새로운 배열의 length 프로퍼티 값은 메서드를 호출한 배열의 lenght 프로퍼티 값와 반드시 일치한다
+- 즉, 호출한 배열과 반환한 배열은 1:1 매핑한다
+- 3개의 인수(호출한 요소값 , 인덱스 , this(map메서드를 호출한 배열 자체))를 전달받을 수 있다
+
+```javascript
+// 인자 3개 (요소값,인덱스,this)
+// JSON.stirngify 메서드 : 객체를 JSON 포맷의 문자열로 변환 (43.2.2절 참고)
+[1,2,3].map((item,index,arr) =>{
+    console.log(item , index, JSON.stringify(arr));
+    return item;
+});
+
+/*
+1 , 0 , [1,2,3]
+2 , 1 , [1,2,3]
+3 , 2 , [1,2,3]
+*/
+```
+
+- 두 번째 인수로 forEach 메서드의 콜백 함수 내부에서 this로 사용할 객체를 전달 할 수 있다
+
+```javascript
+class Prefixer{
+    constructor(prefix){
+        this.prefix = prefix;
+    }
+    
+    add(arr){
+        return arr.map(item => this.prefix + item);
+    }
+}
+
+const prefixer = new Prefixer('-webkit-');
+console.log(prefixer.add(['transition', 'user-select'])); //['-webkit-transition', '-webkit-user-select']
+```
+
+### 27.9.4 Array.prototype.filter
+
+- 자신을 호출한 배열의 모든 요소를 순회하면서 인수로 전달받은 콜백함수를 반복 호출한다
+- 콜백 함수의 반환값이 true인 요소로만 구성된 새로운 배열을 반환한다
+- 원본 배열은 변경되지 않는다
+
+```javascript
+const numbers = [1,2,3,4,5];
+
+//다음의 경우 numbers 배열에서 홀수인 요소만 필터링한다 (1은 true로 평가된다)
+const odds = numbers.filter(item => item % 2);
+console.log(odds);  //[1,3,5];
+```
+
+- forEach , map 메서드와 마찬가지로 자신을 호출한 배열의 모든 요소를 순회하면서 인수로 전달받은 콜백 함수를 반복 호출
+- 차이점 :  반환값
+  - forEach : undefined
+  - map : 새로운 배열
+  - filter : true인 요소만 추출한 새로운 배열
+- 필터링 조건을 만족하는 특정 요소만 추출하여 새로운 배열을 만들 때 사용한다
+- 따라서 반환한 새로운 배열의 lenght 프로퍼티 값은 메서드를 호출한 배열의 lenght 프로퍼티 값과 같거나 작을 수 있다
+- 3개의 인수(호출한 요소값 , 인덱스 , this(filter메서드를 호출한 배열 자체))를 전달받을 수 있다
+- 두 번째 인수로 forEach 메서드의 콜백 함수 내부에서 this로 사용할 객체를 전달 할 수 있다
+- ***<u>자신을 호출한 배열에서 특정 요소를 제거하기 위해 사용할 수도 있다</u>***
+
+```javascript
+const users = [
+    {id:1, name:'lee'},
+    {id:2, name:'kim'},
+];
+
+const remove = (id) => {
+    users.filter(user => user.id !== id);
+};
+
+users.remove(1);    //id가 1인 사용자를 제거
+console.log(user);   //[{id:2, name:'kim'}]
+```
+
+- 특정 요소를 제거할 경우, 중복되어 있다면 중복된 요소가 모두 제거 된다
+- ***<u>중복된 요소중에 하나만 제거하려면 indexOf 메서드를 통해 특정 요소의 인덱스를 취득한 다음 splice 메서드를 사용한다</u>***
 
 
