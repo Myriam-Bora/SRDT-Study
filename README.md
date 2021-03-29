@@ -118,6 +118,10 @@
 
 <br>
 
+### [27 배열](#27-배열)
+
+**[27.1 배열이란?](#271-배열이란)** 
+
 ------
 
 # 04 변수
@@ -1372,3 +1376,236 @@ const obj ={ x, y };
 - 단, ES6 메서드 축약 표현으로 정의한 메서드는 프로퍼티에 할당한 함수와 다르게 동작한다.
 
   26.2절 "메서드" 참고
+
+
+## 27.4 배열 생성
+
+### 27.4.3 Array.of 
+
+- 전달된 인수를 요소로 갖는 배열을 생성
+- 전달된 인수가 1개 이고, 숫자이더라도 인수를 요소로 갖는 배열을 생성한다
+
+```javascript
+Array.of(1)   // [1]
+```
+
+### 27.4.4 Array.from
+
+- 유사배열객체 또는 이터러블 객체를 인수로 전달받아 배열로 변환하여 반환
+
+```javascript
+Array.from({length:2 , 0:'a', 1:'b'});    // 유사배열 -> ['a','b']
+Array.from('Hello');  					// 이터러블 -> ['H','e','l','l','o']
+
+```
+
+------
+
+## 27.5  배열 요소의 참조
+
+------
+
+## 27.6 배열 요소의 추가와 갱신
+
+- 0 이상의 정수 (또는 정수 형태의 문자열) 외의 값을 인덱스처럼 사용하면 요소가 아닌 프로퍼티가 생성된다
+- 추가된 프로퍼티는 length 프로퍼티 값에 영향을 주지 않는다
+
+------
+
+## 27.7 배열 요소의 삭제
+
+- delete 연산자를 통해 배열의 요소를 삭제하면 배열은 희소 배열이 된다 (권고하지 않음)
+
+- 즉, length 프로퍼티의 값이 바뀌지 않는다
+
+- Array.prototype.splice 사용을 권고
+
+  ------
+
+## 27.8 배열 메서드
+
+- ES5부터 도입된 배열 메서드는 대부분 원본 배열을 직접 변경하지 않고 새로운 배열을 생성하여 반환하는 경우가 많다
+- 원본 배열을 직접 변경하게 되면 외부 상태를 직접 변경하는 부수 효과가 있을 수 있으므로 직접 변경하지 않는 메서드 사용을 권장
+
+### 27.8.1 Array.isArray
+
+- 전달된 인수가 배열이면 true , 배열이 아니면 false를 반환
+
+```javascript
+//true
+Array.isArray([]);
+Array.isArray([1,2]);
+Array.isArray(new Array());
+
+//false
+Array.isArray();
+Array.isArray({});
+Array.isArray(null);
+Array.isArray(undefined);
+Array.isArray(1);
+Array.isArray('Array');
+Array.isArray(true);
+Array.isArray(false);
+Array.isArray({0:1, lenght:1})
+```
+
+
+
+### 27.8.2 Array.prototype.indexOf
+
+- 원본 배열에서 인수로 전달된 요소를 검색하여 인덱스를 반환
+- 인수로 전달한 요소와 중복되는 요소가 여러 개라면 첫 번째로 검색된 요소의 인덱스를 반환
+- 인수로 전달한 요소가 존재하지 않으면 -1 을 반환
+
+```javascript
+const arr = [1,2,3];
+arr.indexOf(2);   // 1
+arr.indexOf(4);   // -1
+arr.indexOf(2,2); // 2  : 두 번째 인수 : 검색을 시작할 인덱스, 생략하면 처음부터 검색한다
+```
+
+- 배열에 특정 요소가 존재하는지 확인할 때 유용
+
+```javascript
+const foods = ['apple','banana','orange'];
+
+//foods 배열에 'orange'요소가 있는지 검색한다
+//존재하지 않으면 'orange'요소를 추가한다
+if(foods.indexOf('orange') === -1){
+    foods.push('orange');
+}
+
+console.log(foods);     //["apple"."banana","orange"]
+
+```
+
+
+
+- ES7에 도입된 Array.protorype.includes 메서드를 사용하면 가독성이 더 좋다
+
+```javascript
+const foods = ['apple','banana','orange'];
+
+//foods 배열에 'orange'요소가 있는지 검색한다
+//존재하지 않으면 'orange'요소를 추가한다
+if(!foods.includes('orange')){
+    foods.push('orange');
+}
+
+console.log(foods);     //["apple"."banana","orange"]
+```
+
+
+
+### 27.8.3 Array.prototype.push
+
+- 인수로 전달받은 모든 값을 원본 배열의 마지막 요소로 추가하고 변경된 length 프로퍼티 값을 번환
+- 원본 배열을 직접 변경한다
+
+```javascript
+const arr = [1,2];
+
+let result = arr.push(3,4);
+console.log(result);   //4  : length 값 반환
+
+console.log(arr);      //[1,2,3,4]
+```
+
+- 추가할 요소가 하나뿐이라면 push메서드 보단 length 프로퍼티를 사용하여 마지막 요소에 직접 추가하는 것이 성능면에서 더 빠르다
+
+```javascript
+const arr = [1,2];
+
+arr[arr.length] = 3;
+console.log(arr);      //[1,2,3,]
+```
+
+- 원본 배열을 직접 변경하는 부수 효과가 있기 때문에 ES6 스프레드 문법을 사용하는 편이 좋다 (35장 참고)
+
+### 27.8.4 Array.protype.pop
+
+- 원본 배열에서 마지막 요소를 제거하고 제거한 요소를 반환한다
+- 빈 배열이면  undefined를 반환한다
+- 원본 배열을 직접 변경한다
+- pop 와 push 메서드를 사용하여 스택을 구현할 수 있다
+- ***스택*** : 데이터를 마지막에 밀어 넣고 마지막에 밀어 넣은 데이터를 먼저 꺼내는 후입 선출 방식
+
+### 27.8.5 Array.prototype.unshift
+
+- 인수로 전달받은 모든 값을 원본 배열의 선두에 요소로 추가하고 변경된 length 프로퍼티 값을 반환
+- 원본 배열을 직접 변경한다
+- 원본 배열을 직접 변경하는 부수 효과가 있기 때문에 ES6 스프레드 문법을 사용하는 편이 좋다 (35장 참고)
+
+### 27.8.6 Array.prototype.shift
+
+- 원본 배열에서 첫 번째 요소를 제거하고 제거한 요소를 반환
+- 빈 배열이면  undefined를 반환한다
+- 원본 배열을 직접 변경한다
+- shift 와 push 메서드를 사용하여 큐를 구현할 수 있다
+- <u>**큐**</u> : 데이터를 마지막에 밀어 넣고, 처음 데이터(가장 먼저 밀어 넣은 데이터)를 먼저 꺼내는 선입 선출 방식
+
+### 27.8.7 Array.prototype.concat
+
+- 인수로 전달된 값들(배열 또는 원시값)을 원본 배열의 마지막 요소로 추가한 후 새로운 배열을 반환
+- 인수로 전달한 값이 배열인 경우 배열을 해체하여 새로운 배열의 요소로 추가한다
+- push와 unshift 메서드를 사용할 경우 원본 배열을 반드시 변수에 저장해두어야 하지만
+- concat 메서드를 사용할 경우 반환 값을 반드시 변수에 할당받아야 한다
+- 인수로 전달받은 값이 배열인 경우push와 unshift 메서드는 배열 원본 그대로 요소로 추가하지만, concat 메서드는 배열을 해체하여 마지막 요소로 추가한다
+
+```javascript
+const arr = [3,4];
+
+arr.unshift([1,2]);
+arr.push([5,6]);
+console.log(arr);  // [[1,2],3,4,[5,6]];
+
+let result = [1,2].concat([3,4]);
+result = result.concat([5,6]);
+console.log(result);  //[1,2,3,4,5,6];
+```
+
+- ES6 스프레드 문법으로 대체할 수 있다
+
+### 27.8.8 Array.prototype.splice
+
+- 원본 배열 중간에 요소를 추가하거나 중간에 있는 요소를 제거하는 경우 사용
+- 3개의 매개변수가 있으며 원본 배열을 직접 변경한다
+  - start : 요소를 제거하기 시작할 인덱스
+    - -1 : 마지막 요소
+    - -n : 마지막에서 n번째 요소
+  - deleteCount : start부터 제거할 요소의 개수
+    - 0 : 아무런 요소도 제거하지 않는다 (옵션)
+  - items : 제거한 위치에 삽입할 요소들의 목록
+    - 생략 : 원본 배열에서 요소들을 제거하기만 한다 (옵션)
+
+```javascript
+const arr = [1,2,3,4];
+
+const result = arr.splice(1,2,20,30); //인덱스1부터 2개의 요소를 제거하고, 그 자리에 새로운 요소 20,30을 삽입
+console.log(result);     //[2,3]
+console.log(arr);		//[1,20,30,4];
+```
+
+- 특정 요소를 제거하려면 indexOf 메서드를 통해 특정 요소의 인덱스를 취득한 다음 splice 메서드를 사용한다
+
+```javascript
+const arr = [1,2,3,1,2];
+function remove(array,item){
+    const index = array.indexOf(item); //제거할 item요소의 인덱스 반환
+    if(index !== -1) array.splice(index,1);  //제거할 item요소가 있으면 제거한다
+    return array;
+}
+console.log(remove(arr,2)); //[1,3,1,2]
+console.log(remove(arr,10)); //[1,3,1,2]
+```
+
+- filter 메서드를 사용하여 특정 요소가 중복된경우 모두 제거한다
+
+```javascript
+const arr = [1,2,3,1,2];
+function removeAll(array,item){
+    return array.filter(v => v !== item);
+};
+console.log(removeAll(arr,2));   //[1,3,1]
+```
+
