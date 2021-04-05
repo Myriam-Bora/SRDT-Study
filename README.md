@@ -2265,10 +2265,109 @@ arr.flatMap(x => x.split(''));      // ['h','e','l','l','o','w','o','r','l','d']
       - 즉, 태스크 큐에 일시 보관된 함수들은 비동기 처리 방식으로 동작한다
 
 
+------
 
+# 43 Ajax
 
+## 43.1 Ajax란?
+
+- 자바스크립트를 사용하여 브라우저가 서버에게 비동기 방식으로 데이터를 요청하고 서버가 응답한 데이터를 수신하여 웹피이지를 동적으로 갱신하는 프로그래밍 방식
+- 브라우저에서 제공하는 Web API인 XMLHttpRequest 객체를 기반으로 동작한다
+  - XMLHttpRequest  : HTTP 비동기 통신을 위한 메서드와 프로퍼티 제공
+- 서버로부터 웹페이지의 변경에 필요한 데이터만 비동기 방식으로 전송받아 웹피이지를 변경할 필요가 없는 부분은 다시 렌더링하지 않고 부분적으로 렌더링하는 방식
 
 ------
+
+## 43.2 JSON
+
+- 클라이언트와 서버 간의 HTTP 통신을 위한 텍스트 데이터 포맷
+- 자바스크립트에 종속되지 않는 언어 독립형 데이터 포맷. 대부분 프로그래밍 언어에서 사용 가능
+
+### <u>**43.2.1 JSON 표기 방식**</u>
+
+- 키는 반드시 큰따옴표로 묶어야 한다
+- 값은 객체 리터럴과 같은 표기법을 그대로 사용할 수 있다
+- 문자열은 반드시 큰따옴표로 묶어야 한다
+
+
+
+### <u>43.2.2 JSON.stringify</u>
+
+- 객체를 JSON 포맷의 문자열로 변환한다
+- ***<u>직렬화</u>*** : 클라이언트가 서버로 객체를 전송하기 위해 객체를 문자열화 하는 것
+- 배열도 JSON 포맷의 문자열로 변환한다
+
+
+
+### <u>43.2.3 JSON.parse</u>
+
+- JSON 포맷의 문자열을 객체로 변환
+- ***<u>역직렬화</u>*** : 문자열을 객체로서 사용하기 위해 JSON 포맷의 문자열을 객체화 하는 것
+
+
+
+### <u>43.3 XMLHttpRequest</u>
+
+- 브라우저는 주소창이나 HTML form / a 태그를 통해 HTTP 요청 전송 기능을 기본 제공한다
+- 자바스크립트를 이용하여 HTTP 요청을 전송하려면 XMLHttpRequest 객체를 사용한다
+
+### <u>43.3.1 XMLHttpRequest 객체 생성</u>
+
+```javascript
+const xhr = new XMLHttpRequest();
+```
+
+
+
+### <u>43.3.2 XMLHttpRequest 객체의 프로퍼티와 메서드</u>
+
+- XMLHttpRequest 객체는 다양한 프로퍼티와 메서드를 제공한다
+- XMLHttpRequest 객체의 프로토타입 프로퍼티
+
+| 프로토타입 프로퍼티 | 설명                                                         |
+| :------------------ | :----------------------------------------------------------- |
+| readyState          | HTTP 요청의 현재 상태를 나타내는 정수. 다음과 같은 XMLHttpRequest 정적 프로퍼티를 값으로 갖는다                                                 UNSENT : 0 , OPENED : 1 , HEADERS_RECEIVED : 2 , LOADING : 3, DONE : 4 |
+| status              | HTTP 요청에 대한 응답 상태 (HTTP 상태 코드)를 나타내는 정수 예)200 |
+| statusText          | HTTP 요청에 대한 응답 메세지를 나타내는 문자열  예)"OK"      |
+| responseType        | HTTP 응답 타입  예)document, json, text, blob, arraybuffer   |
+| response            | HTTP 요청에 대한 응답 몸체(response body), responseType에 따라 타입이 다르다 |
+| responseText        | 서버가 전송한 HTTP 요청에 대한 응답 문자열                   |
+
+- XMLHttpRequest 객체의 이벤트 핸들러 프로퍼티
+- XMLHttpRequest  객체의 메서드
+- XMLHttpRequest 객체의 정적 프로퍼티
+
+### <u>43.3.3 HTTP 요청전송</u>
+
+- HTTP 요청을 전송하는 경우 다음 순서를 따른다
+  - XMLHttpRequest.prototype.open 메서드로 HTTP 요청을 초기화 한다
+  - 필요에 따라 XMLHttpRequest.prototype.setRequestHeader 메서드로 특정 HTTP 요청 헤더 값을 설정한다
+  - XMLHttpRequest.prototype.send 메서드로 HTTP 요청을 전송한다
+- XMLHttpRequest.prototype.open
+  - 서버에 전송할 HTTP 요청을 초기화 한다
+- XMLHttpRequest.prototype.send
+  - open 메서드로 초기화된 HTTP 요청을 서버에 전송한다
+  - 기본적으로 서버로 전송하는 데이터는 GET,POST 요청 메서드에 따라 전송 방식에 차이가 있다
+    - GET : 데이터를 URL의 일부분인 쿼리 문자열로 서버에 전송
+    - POST : 데이터(페이로드)를 요청 몸체 (request body)에 담아 전송
+  - 페이로드가 객체인 경우 반드시 JSON.stringify 메서드를 사용하여 직렬화한 다음 전달해야 한다
+- XMLHttpRequest.prototype.setRequestHeader
+  - 특정 HTTP 요청의 헤더 값을 설정한다
+  - 반드시 open 메서드를 호출한 이후에 호출해야 한다
+  - Content-type : HTTP 요청 헤더 중 하나. 요청 몸체에 담아 전송할 데이터의 MIME 타입의 정보를 표현한다
+  - HTTP 클라이언트가 서버에 요청할 때 서버가 응답할 데이터의 MIME 타입을 Accept로 지정할 수 있다
+  - 만약 Accept 헤더를 설정하지 않으면 send 메서드가 호출될 때 Accept 헤더가 */* 으로 전송된다
+
+```javascript
+xhr.setRequestHeader('accept', 'application/json');
+```
+
+
+
+### <u>43.3.4 HTTP 응답처리</u>
+
+- 서버가 전송한 응답을 처리하려면 XMLHttpRequest 객체가 발생시키는 이벤트를 캐치해야 한다
+- XMLHttpRequest 객체는 다양한 이벤트 핸들러 프로퍼티를 갖는데, 그 중에서 HTTP 요청의 현재 상태를 나타내는 readyState 프로퍼티 값이 변경된 경우 발생하는 readystatechange 이벤트를 캐치하여 다음과 같이 HTTP 응답을 처리할 수 있다.
 
 # 44 REST API
 
