@@ -2407,3 +2407,326 @@ xhr.setRequestHeader('accept', 'application/json');
 |       PUT        |     replace      |  리소스의 전체 교체   |    O     |
 |      PATCH       |      modify      |  리소스의 일부 수정   |    O     |
 |      DELETE      |      delete      | 모든/특정 리소스 삭제 |    X     |
+
+
+
+------
+
+# 45 Promise
+
+- 자바스크립트는 비동기 처리를 위한 하나의 패턴으로 콜백 함수를 사용한다
+- 콜백 패턴은 콜백 헬로 인해 가독성이 나쁘고, 비동기 처리 중 발생한 에러의 처리가 곤란하며 여러 개의 비동기 처리를 한번에 처리하는 데도 한계가 있다
+- ES6에서 비동기 처리를 위한 프로미르를 도입하여 콜백 패턴이 가진 단점을 보완하였다
+
+
+
+## 45.1 비동기 처리를 위한 콜백 패턴의 단점
+
+------
+
+### 45.1.1 콜백 헬
+
+- setTimeout 함수는 비동기 함수인 이유는 콜백 함수의 호출이 비동기로 동작하기 때문이다
+- setTimeout 함수를 호출하면 콜백함수를 호출 스케줄링한 다음, **타이머 id를 반환하고 즉시 종료된다.**
+- 즉, setTimeout의 콜백함수는 setTimeout 함수가 종료된 이후에 호출된다.
+- 따라서 setTimeout 함수 내부의 콜백함수에서 처리 결과를 기대한 대로 반환하거나 할당할 수 없다
+
+```javascript
+let g = 0 ;
+//비동기 함수인 setTimeout 함수는 콜백함수의 처리 결과를 외부로 반환하거나 상위 스포크의 변수에 할당하지 못한다
+setTimeout(()=> {g = 100;}, 0);
+console.log(g);     // 0
+```
+
+- GET 요청을 전송하고 서버의 응답을 받는 get함수도 비동기 함수이다.
+
+```javascript
+//GET 요청을 위한 비동기 함수
+const get = url =>{
+    const xhr = new XMLHttpRequest();
+    xhr.open('GET', url);//요청 초기화
+    xhr.send();          //요청 전송
+    
+    xhr.onload = () =>{
+        if(xhr.status === 200){
+            // 1. 서버의 응답 반환
+            return JSON.parse(xhr.response);
+        }
+        console.error('${xhr.status ${xhr.statusText}');
+    };
+};
+
+// 2. id가 1인 post 취득
+const response = get('https://jsonplacehoder.tplicode.,com/post/1');
+console.log(response);   //undefined
+```
+
+- get 함수가 호출되면 XMLHttpRequest 객체를 생성
+- HTTP 요청 초기화 -> HTTP 요청 전송
+- xhr.onload 이벤트 핸들러 프로퍼티에 이벤트 핸들러를 바인딩하고 종료한다
+- 이때 get 함수에 명시적인 반환문이 없으므로 undefined를 반환한다.
+- xhr.onload 이벤트 핸들러 프로퍼티에 바인딩한 이벤트 핸들러의 반환문(1.)은 get함수의 반환문이 아니다
+- get 함수가 종료되면 get함수의 실행 컨텍스트가 콜스택에서 팝되고
+- 곧바로 (2.)의 console.log가 실행된다. 
+- 이때 console.log의 실행 컨텍스트가 생성되어 실행 컨텍스트 스택에 푸시된다
+- 서버로부터 응답이 도착하면 load이벤트가 발생한다
+- **이때  xhr.onload 핸들러 프로퍼티에 바인딩한 이벤트 핸들러가 즉시 실행되는 것이 아니라 load이벤트가 발생 발생하면 태스크 큐에 저장되어 대기하다가 콜 스택이 비어 있게 되면 이벤트 루프에 의해 콜스택으로 푸시되어 실행된다.**
+- 비동기 함수의 처리결과(서버의 응답 등)에 대한 후속 처리를 비동기 함수 내부에서 수행해야 한다
+- 이때, 일반적으로 콜백함수를 사용하게 된다
+
+```javascript
+//GET 요청을 위한 비동기 함수
+const get = (url,seccessCallback,failureCallback) =>{
+    const xhr = new XMLHttpRequest();
+    xhr.open('GET', url);//요청 초기화
+    xhr.send();          //요청 전송
+    
+    xhr.onload = () =>{
+        if(xhr.status === 200){
+            // 1. 서버의 응답을 콜백함수에 인수로 전달하면서 호출하여 응답에 대한 후속 처리를 함
+            successCallback(JSON.parse(xhr.response));
+        }
+            //에러 정보를 콜백함수 인수로 전달하면서 호출하여 에러 처리를 함
+        	failureCallback(xhr.status);
+    };
+};
+
+// 2. id가 1인 post 취득
+//서버의 응답에 대한 후속처리를 위한 콜백함수를 비동기 함수인 get에 전달해야 한다
+const response = get('https://jsonplacehoder.tplicode.,com/post/1', console.log, console.error);
+/*
+{
+	"userId":1,
+	 ...
+}
+*/
+```
+
+- 콜백함수를 통해 비동기 처리 결과에 대한 후속처리를 수행하는 비동기 함수가 결과를 가지고 또 다시 비동기 함수를 호출해야 하는 복잡도 발생
+
+### <u>45.1.2 에러 처리의 한계</u>
+
+- 콜백 패턴의 문제점 중 하나는 에러처리가 힘들다는 것
+
+```javascript
+//1초 후에 콜백함수가 실행되도록 타이머를 설정하고, 이후 콜백함수는 에러를 발생시킨다
+try{
+    setTimeout(()=> {throw new Error('Error!');}, 1000);
+}catch (e){
+    console.log("캐치한 에러",e);
+}
+```
+
+- 위 코드에서 발생한 에러는 catch 코드 블록에서 캐치 되지 않는다
+  - setTimeout 함수의 콜백함수가 실행될 때 setTimeout 함수는 이미 콜스택에서 제거된 상태
+  - 즉, 콜백함수를 호출한 것이 setTimeout  함수가 아니라는 것을 의미한다
+- 에러는 호출자 방향으로 전파된다
+- 즉, 콜스택의 아래 방향 (실행 중인 실행 컨텍스트가 푸시되기 직전에 푸시된 실행 컨텍스트 방향)으로 전파된다.
+  - 위 코드에서 콜백함수를 호출한 것은 setTimeout 이 아니기 때문에 catch에서 캐치 되지 않는다
+
+------
+
+## 45.2 프로미스의 생성
+
+- ES6에 도입되어, 호스트 객체가 아닌 ECMAScript 사양에 정의된 표준 빌트인 객체이다
+- 비동기 처리를 수행할 콜백함수를 인수로 전달받고, 해당 콜백함수를 resolve(비동기처리 성공)와 reject(실패)함수를 인수로 전달 받는다
+
+```javascript
+const promiseGet = url => {
+    const xhr = new XMLHttpRequest();
+	xhr.open('GET',url);
+	xhr.send();
+
+	xhr.onload=()=>{
+        if(xhr.statues === 200){
+            resolve(JSON.parse(xhr.response));
+        }else{
+            reject(new Error(xhr.status));
+        }
+    };
+};
+promiseGet('https://jsonplacehoder.tplicode.com/post/1');
+```
+
+- 프로미스의 진행 상태
+
+| 상태 정보 |                 의미                  |          상태 변경 조건          | 처리 결과 |
+| :-------: | :-----------------------------------: | :------------------------------: | :-------: |
+|  pending  | 비동기 처리가 아직 수행되지 않은 상태 | 프로미스가 생성된 직후 기본 상태 |           |
+| fulfilled |   비동기 처리가 수행된 상태 (성공)    |        resolve 함수 호출         |   value   |
+| rejected  |   비동기 처리가 수행된 상태 (실패)    |         reject 함수 호출         |   error   |
+
+- 비동기 처리 성공 : resolve 함수를 호출해 프로미스를 fulfilled 상태로 변경
+- 비동기 처리 실패 : reject 함수를 호출해 프로미스를 rejected 상태로 변경
+- **settled** 상태 : fulfilled 또는 rejected 상태 , 상태와 상관 없이 pending이 아닌 상태. 즉, 비동기 처리가 수행된 상태
+  - settled 상태가 되면 다른 상태로 변화할 수 없다
+- 비동기 처리가 성공하면 프로미스는 **결과인 1**을 값으로 갖는다
+- 실패시 **Error 객체**를 값으로 갖는다
+
+------
+
+## 45.3 프로미스의 후속 처리 메서드
+
+- 비동기 처리 상태 변화 후 이에 따른 후속 처리를 위해 then,catch,finally 메서드를 제공한다
+- 비동기 처리 상태가 변화하면 후속 처리 메서드에 인수로 전달한 콜백함수가 선택적으로 호출된다
+- 모든 후속 처리 메서드는 프로미스를 반환하고, 비동기로 동작한다
+
+### <u>45.3.1 Promise.prototype.then</u>
+
+- 두 개의 콜백함수를 인수로 전달 받는다
+  - 첫번째 콜백함수 : 프로미스가 fulfilled가 되면 호출된다. 프로미스의 비동기 처리 결과를 인수로 전달받는다
+  - 두번째 콜백함수 : 프로미스가 rejected가 되면 호출된다. 프로미스의 에러를 인수로 전달받는다
+
+```javascript
+//fulfilled
+new Promise(resolve => resolve('fulfilled')).then(v => console..log(v), e => console.error(e));   //fulfilled
+
+//rejected
+new Promise(( _, resolve) => reject(new Error('rejected'))).then(v => console.log(v), e => console.log(error(e)); //Error:rejected
+```
+
+-  then은 언제나 프로미스를 반환한다
+- 만약 콜백함수가 프로미스가 아닌 값을 반환하면 그 값을 암묵적으로 resolve 또는 reject 하여 프로미스를 생성해 반환한다
+
+
+
+### <u>45.3.2 Promise.prototype.catch</u>
+
+- 한 개의 콜백함수를 인수로 전달받는다
+- 콜백함수는 프로미스가 rejected 상태인 경우만 호출된다
+
+```javascript
+//rejected
+new Promise((_, reject) => reject(new Error('rejected'))).catch(e => console.log(e)); //Error:rejected
+```
+
+- then(undefined,onRejected)와 동일하게 동작한다
+- 언제나 프로미스를 반환한다
+
+
+
+### <u>45.3.3 Promise.prototype.finally</u>
+
+- 한 개의 콜백함수를 인수로 전달받는다
+- 프로미스의 성공,실패 상관없이 무조건 한 번 호출된다
+- 프로미스의 상태와 상관없이 공통적으로 수행해야 할 처리 내용이 있을 때 유용하다
+- 언제나 프로미스를 반환한다
+
+```javascript
+new Promise(()=>{}).finally(()=> console.log('finally'));   //finally
+```
+
+------
+
+## 45.4 프로미스의 에러 처리
+
+- then 메서드에 두 번째 콜백 함수를 전달하는 것 보다 catch메서드를 사용하는 것이 더 가독성이 좋고 명확하다
+- 따라서 에러 처리는 catch 메서드에서 하는 것을 권장
+
+------
+
+## 45.5 프로미스 체이닝
+
+- **<u>*프로미스 체이닝*</u>** : then, catch finally 후속 처리 메서드는 언제나 프로미스를 반환하므로 연속적으로 호출 할 수 있다
+
+------
+
+## 45.6 프로미스의 정적 메서드
+
+### <u>45.6.1 Promise.resolve / Promise.reject</u>
+
+- 이미 존재하는 값을 래핑하여 프로미스를 생성하기 위해 사용
+
+### <u>45.6.2 Promise.all</u>
+
+- 여러 개의 비동기 처리를 모두 병렬 처리할 때 사용
+
+```javascript
+const requestData1 = () =>
+    new Promise(resolve => setTimeout(() => resolve(1), 3000));
+const requestData2 = () =>
+    new Promise(resolve => setTimeout(() => resolve(2), 2000));
+const requestData3 = () =>
+    new Promise(resolve => setTimeout(() => resolve(3), 1000));
+
+//세 개의 비동기 처리를 순차적으로 처리
+const res = [];
+requestData1().then(data => {
+    res.push(data);
+    return requestData2();
+})
+.then(data => {
+    res.push(data);
+    return requestData3();
+})
+.then(data => {
+    res.push(data);
+    console.log(res); //[1,2,3]  => 약 6초 소요
+})
+.catch(console.error);
+```
+
+- 위 예제는 세 개의 비동기 처리는 서로 의존하지 않고 개별적으로 수행된다
+- 따라서 비동기 처리를 순차적으로 처리할 필요가 없다
+
+```javascript
+const requestData1 = () =>
+    new Promise(resolve => setTimeout(() => resolve(1), 3000));
+const requestData2 = () =>
+    new Promise(resolve => setTimeout(() => resolve(2), 2000));
+const requestData3 = () =>
+    new Promise(resolve => setTimeout(() => resolve(3), 1000));
+
+//세 개의 비동기 처리를 병렬로 처리
+Promise.all([requestData1(), requestData2(), requestData3()]).then(console.log) //[1,2,3]  약 3초소요
+.catch(console.error);
+```
+
+- 프로미스를 요소로 갖는 배열 등의 이터러블을 인수로 전달 받는다
+- 전달 받은 모든 프로미스가 fulfilled 상태가 되면 모든 처리 결과를 배열에 저장해 새로운 프로미스를 반환한다
+- 인수로 전달받은 프로미스가 하나라도 rejected 상태가 되면 나머지 프로미스가 fufilled 상태가 되는 것을 기디리지 않고 즉시 종료한다
+- 인수로 전달받은 이터러블 요소가 프로미스가 아닌 경우 Promise.resolve 메서드를 통해 프로미스로 래핑한다
+
+### <u>45.6.3 Promise.race</u>
+
+- 프로미스를 요소로 갖는 배열 등의 이터러블을 인수로 전달 받는다
+- 가장 먼저 fulfilled 상태가 된 프로미스의 처리 결과를 resolve하는 새로운 프로미스를 반환한다
+- 인수로 전달받은 프로미스가 하나라도 rejected 상태가 되면 나머지 프로미스가 fufilled 상태가 되는 것을 기디리지 않고 즉시 종료한다
+
+
+
+### 45.6.4 Promise.allSettled
+
+- 프로미스를 요소로 갖는 배열 등의 이터러블을 인수로 전달 받는다
+- 전달 받은 프로미스가 모두 settled상태 (비동기 처리가 수행된 상태)가 되면 처리 별과를 배열로 반환한다
+- 처리 결과를 나타내는 객체
+  - fulfilled 상태 : 비동기 처리 상태를 나타내는 status 프로퍼티와 처리 결과를 나타내는 value 프로퍼티
+  - rejected 상태 : 비동기 처리 상태를 나타내는 status 프로퍼티와 에러를 나타내는 reason 프로퍼티
+
+------
+
+## 45.7 마이크로태스크 큐
+
+```javascript
+//로그가 출력 되는 순서는..?
+
+setTimeout(()=> console.log(1), 0);
+Promise.resolve()
+	.then(()=>console.log(2));
+	.then(()=>console.log(3));
+
+// 2->3->1
+```
+
+- 프로미스의 후속 처리 메서드의 콜백함수는 태스크 큐가 아니라 마이크로태스크 큐에 저장 된다
+- ***<u>마이크로태스크 큐</u>*** :  태스크 큐와는 별도의 큐. 프로미스의 후속처리 메서드의 콜백함수가 일지 저장된다
+  - 태스크 큐보다 우선순위가 높다
+
+------
+
+## 45.8 fetch
+
+- XMLHttpRequest 객체와 마찬가지로 HTTP 요청 전송 기능을 제공하는 클라이언트 사이드 Web API
+- XMLHttpRequest  객체보다 사용법이 간단하고 프로미스를 지원한다 **(IE 미지원)**
+- HTTP 요청을 전송한 URL , HTTP 요청 메서드, HTTP 요청 헤더, 페이로드 등을 설정한 객체를 전달한다
+- HTTP 응답을 나타내는 Response 객체를 래핑한 Promise 객체를 반환한다
